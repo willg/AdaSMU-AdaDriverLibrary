@@ -56,6 +56,8 @@ with Ada.Real_Time; use Ada.Real_Time;
 procedure Blinky is
 
    Period : constant Time_Span := Milliseconds (500);  -- arbitrary
+   subtype counts is Integer range 0 .. 10;
+   count : counts := 0;
 
    Next_Release : Time := Clock;
 
@@ -81,7 +83,8 @@ procedure Blinky is
 begin
    Initialize_LEDs;
    STM32.Button.Initialize;
-   LCD_Std_Out.Put ("Hello, World!");
+   LCD_Std_Out.Put ("Hello, World!  ");
+   LCD_Std_Out.Put ("Press to count");
 
    Toggle (Red);
    Next_Release := Next_Release + Period;
@@ -90,6 +93,10 @@ begin
       Toggle (Green);
       if STM32.Button.Has_Been_Pressed then
          Toggle (Red);
+         count := count + 1;
+         LCD_Std_Out.Clear_Screen;
+         LCD_Std_Out.Put ("Presses:");
+         LCD_Std_Out.Put (count'Image);
       end if;
 
 
