@@ -103,4 +103,13 @@ begin
       Next_Release := Next_Release + Period;
       delay until Next_Release;
    end loop;
+exception
+      when Constraint_Error =>
+      LCD_Std_Out.Clear_Screen;
+      LCD_Std_Out.Put ("An error occured!");
+      loop
+         Toggle (Red);
+         Next_Release := Next_Release + Period;
+         delay until Next_Release;
+      end loop;
 end Blinky;
