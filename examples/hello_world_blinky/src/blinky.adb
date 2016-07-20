@@ -53,7 +53,7 @@ with Ada.Real_Time; use Ada.Real_Time;
 
 procedure Blinky is
 
-   Period : constant Time_Span := Milliseconds (200);  -- arbitrary
+   Period : constant Time_Span := Milliseconds (100);  -- arbitrary
 
    Next_Release : Time := Clock;
 
@@ -79,8 +79,12 @@ procedure Blinky is
 begin
    Initialize_LEDs;
 
+   Toggle (Red);
+   Next_Release := Next_Release + Period;
+   delay until Next_Release;
    loop
-      Toggle (All_LEDs);
+      Toggle (Green);
+      Toggle (Red);
 
       Next_Release := Next_Release + Period;
       delay until Next_Release;
