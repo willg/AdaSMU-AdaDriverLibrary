@@ -47,13 +47,14 @@ with Last_Chance_Handler;  pragma Unreferenced (Last_Chance_Handler);
 
 with STM32.Device;  use STM32.Device;
 with STM32.Board;   use STM32.Board;
+with STM32.Button;
 
 with STM32.GPIO;    use STM32.GPIO;
 with Ada.Real_Time; use Ada.Real_Time;
 
 procedure Blinky is
 
-   Period : constant Time_Span := Milliseconds (100);  -- arbitrary
+   Period : constant Time_Span := Milliseconds (500);  -- arbitrary
 
    Next_Release : Time := Clock;
 
@@ -78,13 +79,17 @@ procedure Blinky is
 
 begin
    Initialize_LEDs;
+   STM32.Button.Initialize;
 
    Toggle (Red);
    Next_Release := Next_Release + Period;
    delay until Next_Release;
    loop
       Toggle (Green);
-      Toggle (Red);
+      if STM32.Button.Has_Been_Pressed then
+         Toggle (Red);
+      end if;
+
 
       Next_Release := Next_Release + Period;
       delay until Next_Release;
