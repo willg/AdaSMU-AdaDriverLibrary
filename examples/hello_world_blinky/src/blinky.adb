@@ -51,11 +51,15 @@ with STM32.Board;   use STM32.Board;
 with STM32.Button;
 with LCD_Std_Out;
 
-with STM32.DAC;     use STM32.DAC;
+
 with STM32.GPIO;    use STM32.GPIO;
 with Ada.Real_Time; use Ada.Real_Time;
 
+with Config; use Config;
+with dacControl; use dacControl;
+
 procedure Blinky is
+   pragma Priority (MAIN_TASK_PRIORITY);
 
    use type Word;
 
@@ -64,9 +68,6 @@ procedure Blinky is
    count : counts := 0;
 
    Next_Release : Time := Clock;
-
-   Output_Channel : constant DAC_Channel := Channel_1;
-   procedure ConfigureDAC_GPIO (Output_Channel : DAC_Channel);
 
    procedure Initialize_LEDs;
    --  Enables the clock and configures the GPIO pins and port connected to the
@@ -87,41 +88,12 @@ procedure Blinky is
       Configure_IO (All_LEDs, Configuration);
    end Initialize_LEDs;
 
-   procedure ConfigureDAC_GPIO (Output_Channel : DAC_Channel) is
-      Output : constant GPIO_Point := (if Output_Channel = Channel_1
-                                       then DAC_Channel_1_IO
-                                       else DAC_Channel_2_IO);
-      Config : GPIO_Port_Configuration;
-   begin
-      Enable_Clock (Output);
-      Config.Mode := Mode_Analog;
-      Config.Resistors := Floating;
-      Configure_IO (Output, Config);
-   end ConfigureDAC_GPIO;
-
-
-      Value   : Word := 0;
-      Percent : Word;
-      K       : Word := 0;
-
-      Resolution : constant DAC_Resolution := DAC_Resolution_12_Bits;
-      --  Arbitrary, change as desired.  Counts will automatically adjust.
-
-      Max_Counts : constant Word := (if Resolution = DAC_Resolution_12_Bits
-                                     then Max_12bit_Resolution
-                                     else Max_8bit_Resolution);
 begin
    Initialize_LEDs;
    STM32.Button.Initialize;
-   ConfigureDAC_GPIO (Output_Channel);
    LCD_Std_Out.Put ("Hello, World!  ");
    LCD_Std_Out.Put ("Press to count");
-
-   Enable_Clock (DAC_1);
-   Reset (DAC_1);
-   Select_Trigger (DAC_1, Output_Channel, Software_Trigger);
-   Enable_Trigger (DAC_1, Output_Channel);
-   Enable (DAC_1, Output_Channel);
+   dacControl.dacInit;
 
    Toggle (Red);
    Next_Release := Next_Release + Period;
@@ -135,24 +107,10 @@ begin
          LCD_Std_Out.Put ("Presses:");
          LCD_Std_Out.Put (count'Image);
 
-         Percent := K * 10;
-         K := K + 1;
-
-         Value := (Percent * Max_Counts) / 100;
-
-         LCD_Std_Out.New_Line;
-         LCD_Std_Out.Put (Value'Image);
-         LCD_Std_Out.New_Line;
-         LCD_Std_Out.Put (Percent'Image);
-
-         Set_Output
-          (DAC_1,
-           Output_Channel,
-           Value,
-           Resolution,
-           Right_Aligned);
-
-         Trigger_Conversion_By_Software (DAC_1, Output_Channel);
+--         LCD_Std_Out.New_Line;
+--         LCD_Std_Out.Put (Value'Image);
+--         LCD_Std_Out.New_Line;
+--         LCD_Std_Out.Put (Percent'Image);
       end if;
 
 
