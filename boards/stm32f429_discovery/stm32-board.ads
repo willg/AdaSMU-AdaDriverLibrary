@@ -67,10 +67,11 @@ package STM32.Board is
 
    Green : User_LED renames PG13;
    Red   : User_LED renames PG14;
+   TestPoint   : User_LED renames PB4;
 
    LCH_LED : User_LED renames Red;
 
-   All_LEDs  : GPIO_Points := Green & Red;
+   All_LEDs  : GPIO_Points := Green & Red & TestPoint;
 
    procedure Initialize_LEDs;
    --  MUST be called prior to any use of the LEDs unless initialization is
