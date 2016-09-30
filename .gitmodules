@@ -1,0 +1,3 @@
+[submodule "examples/hello_world_blinky/src"]
+	path = examples/hello_world_blinky/src
+	url = C:/Users/will/Documents/adaSMU/firmware
